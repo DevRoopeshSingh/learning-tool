@@ -1,7 +1,22 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    background-color: #f0f8ff; /* Light blue background for a friendly vibe */
+    color: #333;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
+  }
+  
+  button {
+    font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
+    cursor: pointer;
+  }
+  
+  * {
+    box-sizing: inherit;
   }
   

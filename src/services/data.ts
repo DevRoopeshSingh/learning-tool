@@ -1,4 +1,10 @@
-export const quizData = [
+export interface Quiz {
+  question: string;
+  answer: string;
+  options: string[];
+}
+
+export const quizData: Quiz[] = [
   { question: "29 - 30?", answer: "-1", options: ["-3", "-1", "0", "4"] },
   { question: "17 + 15?", answer: "32", options: ["27", "28", "32", "37"] },
   {

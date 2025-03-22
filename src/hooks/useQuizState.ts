@@ -1,56 +1,58 @@
 // src/hooks/useQuizState.ts
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import useLocalStorage from "./useLocalStorage";
+import { useSound } from "./useSound";
+import type { Quiz } from "../services/data";
 
-interface Quiz {
-  question: string;
-  answer: string;
-  options: string[];
-}
-
-interface QuizState {
-  score: number;
-  completed: Set<string>;
-  feedback: Record<string, string>;
-  handleAnswer: (quiz: Quiz, answer: string) => void;
-  resetQuiz: () => void;
-}
-
-export default function useQuizState(): QuizState {
+export const useQuizState = (quizData: Quiz[]) => {
+  const { playSound } = useSound();
   const [score, setScore] = useLocalStorage<number>("quizScore", 0);
   const [completedArray, setCompletedArray] = useLocalStorage<string[]>(
     "completedQuizzes",
     []
   );
-  const completed = new Set(completedArray); // Convert array to Set
   const [feedback, setFeedback] = useState<Record<string, string>>({});
+
+  const completed = useMemo(() => new Set(completedArray), [completedArray]);
+
+  const progress = useMemo(
+    () => (completed.size / quizData.length) * 100,
+    [completed.size, quizData.length]
+  );
 
   const handleAnswer = useCallback(
     (quiz: Quiz, answer: string) => {
       if (!completed.has(quiz.question)) {
-        if (quiz.answer === answer) {
-          setScore((prevScore: number) => prevScore + 1);
-          setFeedback((prevFeedback: Record<string, string>) => ({
-            ...prevFeedback,
-            [quiz.question]: "🎉 Correct! Great job!",
-          }));
-        } else {
-          setFeedback((prevFeedback: Record<string, string>) => ({
-            ...prevFeedback,
-            [quiz.question]: "❌ Oops! Try again next time.",
-          }));
-        }
+        const isCorrect = quiz.answer === answer;
+
+        setScore((prev) => (isCorrect ? prev + 1 : prev));
+        setFeedback((prev) => ({
+          ...prev,
+          [quiz.question]: isCorrect
+            ? "🎉 Correct! Great job!"
+            : "❌ Oops! Try again next time.",
+        }));
         setCompletedArray((prev) => [...prev, quiz.question]);
+
+        playSound(isCorrect ? "correct" : "incorrect");
       }
     },
-    [completed, setScore, setCompletedArray]
+    [completed, setScore, setCompletedArray, playSound]
   );
 
   const resetQuiz = useCallback(() => {
     setScore(0);
     setCompletedArray([]);
     setFeedback({});
-  }, [setScore, setCompletedArray]);
+    playSound("click");
+  }, [setScore, setCompletedArray, playSound]);
 
-  return { score, completed, feedback, handleAnswer, resetQuiz };
-}
+  return {
+    score,
+    completed,
+    feedback,
+    progress,
+    handleAnswer,
+    resetQuiz,
+  };
+};

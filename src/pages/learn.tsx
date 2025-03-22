@@ -1,16 +1,25 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { quizData } from "../services/data";
 import QuizProgress from "../components/QuizProgress";
-import useQuizState from "../hooks/useQuizState";
 import QuizCard from "../components/QuizCard";
+import { LiveAnnouncer } from "../components/LiveAnnouncer";
+import { useQuizState } from "../hooks/useQuizState";
 
 export default function Learn() {
-  const { score, completed, feedback, handleAnswer, resetQuiz } =
-    useQuizState();
-  const currentScore = `${score}/${quizData.length}`;
-  const progress = (completed.size / quizData.length) * 100;
+  const { score, completed, feedback, progress, handleAnswer, resetQuiz } =
+    useQuizState(quizData);
+
+  const currentScore = useMemo(
+    () => `${score}/${quizData.length}`,
+    [score, quizData.length]
+  );
+
+  const latestFeedback = useMemo(
+    () => Object.values(feedback).slice(-1)[0] || "",
+    [feedback]
+  );
 
   return (
     <Box
@@ -24,6 +33,7 @@ export default function Learn() {
         gap: 4,
         position: "relative",
       }}>
+      <LiveAnnouncer message={latestFeedback} />
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}

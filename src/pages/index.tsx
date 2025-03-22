@@ -14,7 +14,7 @@ export default function Home() {
         justifyContent: "center",
         height: "100vh",
         textAlign: "center",
-        backgroundImage: "url('/mascot.jpg')", // Set mascot image as background
+        backgroundImage: "url('/mascot.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
